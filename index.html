@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>Law Indexes: Search Demo</title>
+    <script src="https://unpkg.com/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+    <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.dataTables.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Lora", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="bodytext">
+        This page demonstrates how data in the law indexes released by the Local Geohistory Project can be used to
+        search for and retrieve historical laws, using data for the State of Maine:
+        <br>
+        <br>
+        <table id="indextable" class="stripe"></table>
+    </main>
+    <script src="https://unpkg.com/papaparse@5.5.2/papaparse.min.js"></script>
+    <script>
+        var dataTable = undefined;
+
+        var stateData = {
+            'me': [],
+        };
+
+        var stateLinks = {
+            'me': 'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/output/MeLawIndex.tsv',
+        };
+
+        $(document).ready(async function () {
+            createTable([]);
+            await getStateCsv();
+            createTable(getStateData());
+        });
+
+        function createTable(rowData) {
+            if (dataTable != undefined) {
+                dataTable.destroy();
+            }
+            dataTable = new DataTable('#indextable',
+                {
+                    data: rowData,
+                    responsive: true,
+                    language: {
+                        emptyTable: 'Please wait - data loading!'
+                    },
+                    columns: [
+                        {
+                            data: 'Subject',
+                            title: 'Subject',
+                            defaultContent: '',
+                            responsivePriority: 2
+                        },
+                        {
+                            data: 'Detail',
+                            title: 'Detail',
+                            defaultContent: '',
+                            responsivePriority: 3
+                        },
+                        {
+                            data: 'Citation Law Type',
+                            title: 'Type',
+                            defaultContent: '',
+                            responsivePriority: 6
+                        },
+                        {
+                            data: 'Citation Year',
+                            title: 'Year',
+                            defaultContent: '',
+                            responsivePriority: 4
+                        },
+                        {
+                            data: 'Citation Chapter',
+                            title: 'Chapter',
+                            defaultContent: '',
+                            responsivePriority: 5
+                        },
+                        {
+                            title: 'Link',
+                            render: function (data, type, row) {
+                                var url = '';
+                                if (
+                                    (
+                                        row['Citation Law Type'] == 'Me. Pub. Acts' ||
+                                        row['Citation Law Type'] == 'Me. Priv. & Spec. Acts' ||
+                                        row['Citation Law Type'] == 'Me. Res.'
+                                    )
+                                    && row['Citation Year'] != ''
+                                    && row['Citation Chapter'] != ''
+                                ) {
+                                    var lawType = '';
+                                    url = '<a target="_blank" href="https://lldc.mainelegislature.org/Open/Laws/' + row['Citation Year'] + '/' + row['Citation Year'] + '_';
+                                    if (row['Citation Law Type'] == 'Me. Pub. Acts') {
+                                        if (row['Citation Year'] == '1840' || row['Citation Year'] == '1841') {
+                                            lawType = 'LAW';
+                                        } else {
+                                            lawType = 'PL';
+                                        }
+                                    } else if (row['Citation Law Type'] == 'Me. Priv. & Spec. Acts') {
+                                        if (row['Citation Year'] == '1840' || row['Citation Year'] == '1841') {
+                                            lawType = 'LAW';
+                                        } else {
+                                            lawType = 'PS';
+                                        }
+                                    } else if (row['Citation Law Type'] == 'Me. Res.') {
+                                        lawType = 'RES';
+                                    }
+                                    url += lawType + '_c' + String(row['Citation Chapter']).padStart(3, '0') + '.pdf">View</a>';
+                                }
+                                return url;
+                            },
+                            defaultContent: '',
+                            responsivePriority: 1
+                        }
+                    ]
+                }
+            );
+        }
+
+        function getStateData() {
+            var rowData = [];
+            for (const index of Object.keys(stateLinks)) {
+                rowData.push(...stateData[index]);
+            }
+            return rowData;
+        }
+
+        async function getStateCsv() {
+            for (const index of Object.keys(stateLinks)) {
+                if (stateData[index].length == 0) {
+                    stateData[index] = await getStateCsvData(index);
+                }
+            }
+        }
+
+        function getStateCsvData(stateValue) {
+            return new Promise(resolve => {
+                Papa.parse(stateLinks[stateValue], {
+                    delimiter: '\t',
+                    download: true,
+                    header: true,
+                    quoteChar: '',
+                    skipEmptyLines: true,
+                    complete: function (results) {
+                        resolve(results.data);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
