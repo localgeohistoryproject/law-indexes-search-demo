@@ -39,7 +39,10 @@
         };
 
         var stateLinks = {
-            'me': 'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/me-priv-spec-acts-index/1820-1944.tsv',
+            'me': [
+                'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/me-priv-spec-acts-index/1820-1944.tsv',
+                'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/me-priv-spec-acts-index/1944-1957.tsv'
+            ],
         };
 
         $(document).ready(async function () {
@@ -148,19 +151,29 @@
             }
         }
 
-        function getStateCsvData(stateValue) {
-            return new Promise(resolve => {
-                Papa.parse(stateLinks[stateValue], {
-                    delimiter: '\t',
-                    download: true,
-                    header: true,
-                    quoteChar: '',
-                    skipEmptyLines: true,
-                    complete: function (results) {
-                        resolve(results.data);
-                    }
+        async function getStateCsvData(stateValue) {
+            const links = stateLinks[stateValue];
+            const urlArray = Array.isArray(links) ? links : [links];
+
+            const allData = [];
+
+            for (const url of urlArray) {
+                const data = await new Promise(resolve => {
+                    Papa.parse(url, {
+                        delimiter: '\t',
+                        download: true,
+                        header: true,
+                        quoteChar: '',
+                        skipEmptyLines: true,
+                        complete: function (results) {
+                            resolve(results.data);
+                        }
+                    });
                 });
-            });
+                allData.push(...data);
+            }
+
+            return allData;
         }
     </script>
 </body>
