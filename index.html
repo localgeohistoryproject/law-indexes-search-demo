@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <title>Law Indexes: Search Demo</title>
     <script src="https://unpkg.com/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
-    <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.dataTables.min.css">
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
+    <script src="https://cdn.datatables.net/responsive/3.0.8/js/dataTables.responsive.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.8/css/responsive.dataTables.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
         <br>
         <table id="indextable" class="stripe"></table>
     </main>
-    <script src="https://unpkg.com/papaparse@5.5.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/papaparse@5.5.3/papaparse.min.js"></script>
     <script>
         var dataTable = undefined;
 
@@ -39,7 +39,7 @@
         };
 
         var stateLinks = {
-            'me': 'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/output/MeLawIndex.tsv',
+            'me': 'https://raw.githubusercontent.com/localgeohistoryproject/law-indexes-maine/main/me-priv-spec-acts-index/1820-1944.tsv',
         };
 
         $(document).ready(async function () {
